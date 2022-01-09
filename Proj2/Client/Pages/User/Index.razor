@@ -1,0 +1,73 @@
+﻿@page "/company"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Companies</PageTitle>
+
+<h3>All Companies</h3>
+
+@if (companies == null)
+	{
+		<h3>Loading...</h3>
+	}
+else
+	{
+        <button @onclick="() => OnCreateCompany()" class="btn btn-primary">Add New Company</button>
+		<div class="container d-flex flex-column">
+			@foreach (var company in companies)
+		    {
+                <div class="d-flex justify-content-evenly align-items-center mb-2">
+                    <h4 class="mb-0">@company.Name</h4>
+                    <p class="mb-0">@company.Address</p>
+                    @if (company.Users == null)
+					{
+                        <p class="mb-0">No assigned users</p>
+                    }
+                    else
+					{
+                        <ul>
+                            @foreach (var user in company.Users)
+						    {
+                                <li>@user.Name</li>
+						    }
+                        </ul>
+					}
+                    <button class="btn btn-warning" @onclick="() => OnEditCompany(company)" >Edit Company Info</button>
+                    <button class="btn btn-danger" @onclick="() => DeleteCompanyAsync(company)">Remove Company</button>
+                </div>
+    		}
+
+		</div>
+	}
+
+@code {
+    private List<Company> companies = null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            companies = await Http.GetFromJsonAsync<List<Company>>("/api/Company");
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    private void DeleteCompanyAsync(Company company)
+    {
+        NavigationManager.NavigateTo($"/company/delete/{company.CompanyId}");
+    }
+
+    private void OnEditCompany(Company company)
+    {
+        NavigationManager.NavigateTo($"/company/edit/{company.CompanyId}");
+    }
+
+    private void OnCreateCompany()
+    {
+        NavigationManager.NavigateTo("/company/create");
+    }
+}
+

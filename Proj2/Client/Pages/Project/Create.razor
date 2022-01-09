@@ -1,0 +1,59 @@
+﻿@page "/project/create"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Create New Project</h3>
+
+<div>
+    <EditForm Model="@project" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="ProjectName" class="control-label">Project Name</label>
+            <InputText name="ProjectName" @bind-Value="@project.Name" required />
+            <ValidationMessage For="@(() => project.Name)" />
+        </div>
+        <div class="form-group">
+            <label for="ProjectDescription" class="control-label">Project Description</label>
+            <InputTextArea name="ProjectDescription" @bind-Value="@project.Description" required />
+            <ValidationMessage For="@(() => project.Description)" />
+
+        </div>
+
+        <div class="form-group">
+            <label for="ProjectDescription" class="control-label">Project Description</label>
+            <InputTextArea name="ProjectDescription" @bind-Value="@project.Description" required />
+            <ValidationMessage For="@(() => project.Description)" />
+
+        </div>
+
+        <div class="form-group">
+            <label for="ProjectDescription" class="control-label">Project Description</label>
+            <InputTextArea name="ProjectDescription" @bind-Value="@project.Description" required />
+            <ValidationMessage For="@(() => project.Description)" />
+
+        </div>
+
+        <button class="btn btn-success" type="submit">Save</button>
+        <button class="btn btn-danger" onclick="@(() => NavigationManager.NavigateTo("/Project"))">Cancel</button>
+    </EditForm>
+</div>
+
+@code {
+    public Project project { get; set; } = new Project();
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/project", project);
+            response.EnsureSuccessStatusCode();
+
+            NavigationManager.NavigateTo("/project");
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+}
+

@@ -1,0 +1,66 @@
+﻿@page "/company/edit/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (company == null)
+{
+    <h2>Loading...</h2>
+}
+else
+{
+
+    <h3>Edit @company.Name</h3>
+
+    <div>
+        <EditForm Model="@company" OnValidSubmit="@HandleValidSubmit" >
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label for="companyName" class="control-label">Company Name</label>
+                <InputText name="companyName" @bind-Value="@company.Name" required />
+                <ValidationMessage For="@(() => company.Name)" />
+            </div>
+            <div class="form-group">
+                <label for="companyAddress" class="control-label">Company Address</label>
+                <InputText name="companyAddress" @bind-Value="@company.Address" required />
+                <ValidationMessage For="@(() => company.Address)" />
+            </div>
+
+            <button class="btn btn-success" type="submit">Save</button>
+            <button class="btn btn-danger" onclick="@(() => NavigationManager.NavigateTo("/company"))">Cancel</button>
+        </EditForm>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Company company { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            company = await Http.GetFromJsonAsync<Company>($"/api/company/{Id}");
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"/api/company/{company.CompanyId}", company);
+            response.EnsureSuccessStatusCode();
+            NavigationManager.NavigateTo("/company");
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+}
+

@@ -1,0 +1,61 @@
+﻿@page "/company/delete/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+@if (company == null)
+    {
+        <h2>Loading...</h2>
+    }
+else
+	{
+        <h3>Delete @company.Name?</h3>
+
+        <h4>Confirm you would like to remove this company?</h4>
+        <div class="d-flex justify-content-start">
+            <button class="btn btn-danger w-25" @onclick="() => DeleteCompanyAsync(company)">Delete</button>
+            <button class="btn btn-success w-25" @onclick="() => CancelDelete()">Cancel</button>
+        </div>
+	}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Company company { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            company = await Http.GetFromJsonAsync<Company>($"/api/company/{Id}");
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    private void CancelDelete()
+    {
+        NavigationManager.NavigateTo("/company");
+    }
+
+    private async Task DeleteCompanyAsync(Company company)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"/api/company/{company.CompanyId}");
+            response.EnsureSuccessStatusCode();
+            NavigationManager.NavigateTo("/company");
+
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+}
+
